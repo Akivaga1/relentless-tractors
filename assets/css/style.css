@@ -2492,3 +2492,347 @@ h3 {
   opacity: 1;
   pointer-events: auto;
 }
+
+/* ==========================================================================
+   PREMIUM MOTION & LAZY-LOAD ENHANCEMENTS
+   ========================================================================== */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+body::before {
+  top: -130px;
+  left: -80px;
+  background: rgba(142, 91, 8, 0.45);
+}
+
+body::after {
+  right: -100px;
+  bottom: -130px;
+  background: rgba(0, 112, 0, 0.45);
+}
+
+main,
+header,
+footer,
+section,
+article,
+aside {
+  position: relative;
+  z-index: 1;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px) scale(0.985);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.lazy-image {
+  opacity: 0.4;
+  filter: saturate(0.8) blur(4px);
+  transform: scale(1.02);
+  transition: opacity 0.7s ease, filter 0.8s ease, transform 0.8s ease;
+}
+
+.lazy-image.is-loaded {
+  opacity: 1;
+  filter: saturate(1) blur(0);
+  transform: scale(1);
+}
+
+.machinery-card,
+.service-card,
+.gallery-card,
+.blog-card,
+.contact-card,
+.quote-card,
+.feature-panel,
+.about-visual,
+.stat-card {
+  overflow: hidden;
+}
+
+.machinery-card::before,
+.service-card::before,
+.gallery-card::before,
+.blog-card::before,
+.quote-card::before,
+.contact-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent 45%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.machinery-card:hover::before,
+.service-card:hover::before,
+.gallery-card:hover::before,
+.blog-card:hover::before,
+.quote-card:hover::before,
+.contact-card:hover::before {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .reveal,
+  .lazy-image {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Mobile layout, navigation, and touch-target refinements */
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 2000;
+  padding: 12px 16px;
+  color: var(--white);
+  background: var(--deep-green);
+  border: 2px solid var(--gold-light);
+  border-radius: var(--radius-sm);
+  transform: translateY(-160%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (max-width: 1100px) {
+  .desktop-nav {
+    display: none;
+  }
+
+  .menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --header-height: 68px;
+  }
+
+  .container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .site-header {
+    padding: 8px 0;
+  }
+
+  .header-inner {
+    gap: 10px;
+  }
+
+  .header-actions {
+    gap: 4px;
+  }
+
+  .header-actions .btn-primary.btn-sm,
+  .header-actions .wa-round-btn {
+    display: none;
+  }
+
+  .hero-section {
+    min-height: auto;
+    padding-top: calc(var(--header-height) + 48px);
+    padding-bottom: 52px;
+  }
+
+  .hero-headline {
+    font-size: clamp(2.35rem, 10vw, 3.65rem);
+  }
+
+  .hero-subtext {
+    font-size: 1rem;
+    margin-bottom: 26px;
+  }
+
+  .hero-actions {
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .hero-actions > .btn {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .hero-whatsapp-inline {
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .hero-trust-bar {
+    margin-top: 32px;
+    padding-top: 24px;
+  }
+
+  .section-head {
+    margin-bottom: 36px;
+  }
+
+  .products-grid,
+  .blog-grid,
+  .services-grid,
+  .features-grid-4,
+  .category-cards-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .machinery-card,
+  .service-card,
+  .blog-card,
+  .feature-box {
+    min-width: 0;
+  }
+
+  .about-main-image img {
+    height: min(72vw, 360px);
+  }
+
+  .gallery-grid {
+    grid-auto-rows: 200px;
+  }
+
+  .form-control,
+  select.form-control,
+  textarea.form-control {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  textarea.form-control {
+    min-height: 120px;
+  }
+
+  .site-footer {
+    padding-top: 56px;
+    padding-bottom: 28px;
+  }
+
+  .footer-bottom-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mobile-bottom-bar {
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  }
+
+  .mobile-bottom-bar .btn {
+    min-height: 48px;
+  }
+
+  main {
+    padding-bottom: 72px;
+  }
+
+  .floating-whatsapp-widget {
+    bottom: calc(84px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .brand {
+    gap: 8px;
+  }
+
+  .brand-logo-img {
+    height: 36px;
+  }
+
+  .brand-name {
+    font-size: 0.96rem;
+    letter-spacing: 0.025em;
+  }
+
+  .brand-tagline {
+    display: none;
+  }
+
+  .hero-section {
+    padding-top: calc(var(--header-height) + 36px);
+  }
+
+  .hero-trust-bar {
+    gap: 14px;
+  }
+
+  .card-image-box {
+    height: 210px;
+  }
+
+  .card-body,
+  .blog-card-body {
+    padding: 20px;
+  }
+
+  .quote-card-header,
+  .quote-card-body {
+    padding: 20px;
+  }
+
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-window {
+    max-height: 92dvh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .modal-inner-grid {
+    padding: 22px 18px calc(22px + env(safe-area-inset-bottom));
+  }
+
+  .modal-main-img-box {
+    height: 230px;
+  }
+}

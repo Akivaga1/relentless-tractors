@@ -5,22 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   
   <!-- SEO Primary Metadata -->
-  <title>Relentless Tractors | Agricultural Tractors &amp; Machinery Dealership Kenya</title>
-  <meta name="description" content="Official website of Relentless Tractors Kenya. Explore Zoomlion 4WD tractors, heavy-duty disc ploughs, rotavators, tipping trailers, and genuine spare parts in Chemelil. Request a personalized quotation today.">
-  <meta name="keywords" content="Relentless Tractors, Zoomlion tractors Kenya, tractors for sale Kenya, agricultural machinery Kenya, Chemelil tractors, disc plough Kenya, tractor hire Kisumu, farm implements Eldoret">
+  <title>Tractors &amp; Farm Machinery in Kenya | Relentless Tractors</title>
+  <meta name="description" content="Shop Zoomlion tractors, farm implements and genuine spare parts in Kenya. Visit Relentless Tractors in Chemelil or request a tailored quotation.">
   <meta name="author" content="Relentless Tractors">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#003300">
   <link rel="canonical" href="https://relentlesstractors.com/">
+  <link rel="preload" as="image" href="assets/hero-tractor.jpg" fetchpriority="high">
 
   <!-- OpenGraph / Social Metadata -->
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Relentless Tractors">
+  <meta property="og:locale" content="en_KE">
   <meta property="og:url" content="https://relentlesstractors.com/">
-  <meta property="og:title" content="Relentless Tractors | Power Your Next Harvest">
-  <meta property="og:description" content="Discover dependable tractors, implements, and genuine spare parts engineered for Kenyan farms. Request an official quotation from our Chemelil showroom.">
-  <meta property="og:image" content="assets/hero-tractor.jpg">
+  <meta property="og:title" content="Tractors &amp; Farm Machinery in Kenya | Relentless Tractors">
+  <meta property="og:description" content="Shop dependable Zoomlion tractors, farm implements and genuine parts for Kenyan farms. Visit our Chemelil showroom or request a tailored quote.">
+  <meta property="og:image" content="https://relentlesstractors.com/assets/hero-tractor.jpg">
+  <meta property="og:image:alt" content="Relentless tractor working on Kenyan farmland">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Relentless Tractors Kenya">
-  <meta name="twitter:description" content="Agricultural machinery, 4WD tractors, implements, and genuine spares in Chemelil, Kenya.">
-  <meta name="twitter:image" content="assets/hero-tractor.jpg">
+  <meta name="twitter:title" content="Tractors &amp; Farm Machinery in Kenya | Relentless Tractors">
+  <meta name="twitter:description" content="Shop Zoomlion tractors, farm implements and genuine spare parts in Kenya. Visit our Chemelil showroom or request a tailored quote.">
+  <meta name="twitter:image" content="https://relentlesstractors.com/assets/hero-tractor.jpg">
+  <meta name="twitter:image:alt" content="Relentless tractor working on Kenyan farmland">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/logo_original.png">
@@ -31,7 +37,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261003">
 
   <!-- Structured Data JSON-LD for Local Business & Agricultural Machinery Dealer -->
   <script type="application/ld+json">
@@ -39,10 +45,16 @@
     "@context": "https://schema.org",
     "@type": "AutoDealer",
     "name": "Relentless Tractors",
-    "image": "assets/hero-tractor.jpg",
+    "url": "https://relentlesstractors.com/",
+    "image": "https://relentlesstractors.com/assets/hero-tractor.jpg",
+    "logo": "https://relentlesstractors.com/assets/logo_original.png",
     "description": "Official agricultural machinery and tractor dealership serving farmers and agribusinesses across Kenya.",
     "telephone": "+254708421323",
     "email": "cc@relentlesstractors.com",
+    "areaServed": {
+      "@type": "Country",
+      "name": "Kenya"
+    },
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "Chemelil Sugar Belt Road",
@@ -75,6 +87,7 @@
   </script>
 </head>
 <body>
+  <a class="skip-link" href="#mainContent">Skip to content</a>
 
   <!-- ========================================================================
        SITE HEADER & NAVIGATION
@@ -117,7 +130,7 @@
           </a>
 
           <!-- Mobile Hamburger Toggle -->
-          <button class="menu-btn" id="mobileMenuBtn" aria-label="Open mobile navigation">
+          <button class="menu-btn" id="mobileMenuBtn" aria-label="Open mobile navigation" aria-controls="mobileDrawer" aria-expanded="false">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -131,8 +144,8 @@
   </header>
 
   <!-- Mobile Navigation Drawer -->
-  <div class="drawer-overlay" id="drawerOverlay"></div>
-  <aside class="mobile-nav-drawer" id="mobileDrawer">
+  <div class="drawer-overlay" id="drawerOverlay" aria-hidden="true"></div>
+  <aside class="mobile-nav-drawer" id="mobileDrawer" role="navigation" aria-label="Mobile navigation" aria-hidden="true" inert>
     <div class="mobile-drawer-header">
       <div class="brand">
         <img src="assets/logo_original.png" alt="Relentless Tractors" style="height: 36px;">
@@ -156,7 +169,7 @@
     </ul>
 
     <div class="mobile-drawer-actions">
-      <a href="#quote" class="btn btn-primary" onclick="document.getElementById('mobileDrawer').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('active');">
+      <a href="#quote" class="btn btn-primary">
         Request a Quotation
       </a>
       <a href="https://wa.me/254708421323" class="btn btn-whatsapp" target="_blank" rel="noopener noreferrer">
@@ -1620,7 +1633,7 @@
   </div>
 
   <!-- Main JavaScript Logic -->
-  <script src="assets/js/app.js"></script>
+  <script src="assets/js/app.js?v=20261003"></script>
 
 </body>
 </html>
