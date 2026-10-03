@@ -6,7 +6,7 @@
  */
 
 // 1. VERIFIED INVENTORY DATABASE
-const INVENTORY_DATA = [
+let INVENTORY_DATA = [
   {
     id: "zoomlion-rc904a",
     name: "Zoomlion RC904-A 90HP 4WD",
@@ -250,7 +250,7 @@ const INVENTORY_DATA = [
 ];
 
 // 2. BLOG & GUIDES DATABASE
-const BLOG_ARTICLES = [
+let BLOG_ARTICLES = [
   {
     id: "choose-tractor-horsepower",
     title: "How to Choose the Right Tractor Horsepower for Kenyan Soil & Altitude",
@@ -335,6 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initContactForm();
   initGalleryLightbox();
   initBlogReader();
+  loadCmsContent();
 });
 
 // 4. HEADER SCROLL & MOBILE DRAWER
@@ -477,7 +478,25 @@ let searchQuery = "";
 
 function initCatalogue() {
   const container = document.getElementById("catalogueGrid");
+  const featuredGrid = document.getElementById("featuredProductsGrid");
   if (!container) return;
+  [container, featuredGrid].filter(Boolean).forEach((grid) => {
+    grid.addEventListener("click", (event) => {
+      const productButton = event.target.closest("[data-product-action]");
+      if (!productButton) return;
+      const item = INVENTORY_DATA.find((product) => product.id === productButton.dataset.productId);
+      if (!item) return;
+      if (productButton.dataset.productAction === "quote") openQuotationModal(item.name);
+      else openProductModal(item.id);
+    });
+    grid.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const productButton = event.target.closest('[data-product-action="view"]');
+      if (!productButton) return;
+      event.preventDefault();
+      openProductModal(productButton.dataset.productId);
+    });
+  });
 
   // Search input with debounce
   const searchInput = document.getElementById("catalogueSearchInput");
@@ -567,9 +586,14 @@ function filterAndSortData() {
 function renderCatalogue() {
   const container = document.getElementById("catalogueGrid");
   const counterEl = document.getElementById("catalogueCounter");
+  const featuredGrid = document.getElementById("featuredProductsGrid");
   if (!container) return;
 
   const filtered = filterAndSortData();
+  if (featuredGrid && window.cmsContentEnabled) {
+    featuredGrid.innerHTML = INVENTORY_DATA.filter((item) => item.featured)
+      .map((item) => renderCmsProductCard(item)).join("");
+  }
 
   if (counterEl) {
     counterEl.textContent = `Showing ${filtered.length} of ${INVENTORY_DATA.length} machines in showroom inventory`;
@@ -588,26 +612,26 @@ function renderCatalogue() {
   }
 
   container.innerHTML = filtered.map(item => `
-    <article class="machinery-card" data-id="${item.id}">
-      <div class="card-image-box" onclick="openProductModal('${item.id}')">
-        <img src="${item.image}" alt="${item.name}" loading="lazy">
+    <article class="machinery-card" data-id="${escapeCmsHtml(item.id)}">
+      <div class="card-image-box" data-product-action="view" data-product-id="${escapeCmsHtml(item.id)}" tabindex="0" role="button" aria-label="View ${escapeCmsHtml(item.name)}">
+        <img src="${escapeCmsHtml(safeCmsImage(item.image))}" alt="${escapeCmsHtml(item.name)}" loading="lazy">
         <div class="card-badge-layer">
-          <span class="badge ${item.condition === 'new' ? 'badge-green' : 'badge-gold'}">${item.conditionLabel}</span>
-          <span class="badge badge-stock">${item.availabilityLabel}</span>
+          <span class="badge ${item.condition === 'new' ? 'badge-green' : 'badge-gold'}">${escapeCmsHtml(item.conditionLabel)}</span>
+          <span class="badge badge-stock">${escapeCmsHtml(item.availabilityLabel)}</span>
         </div>
       </div>
       <div class="card-body">
         <div class="card-meta-row">
-          <span class="card-category">${item.categoryLabel}</span>
-          <span class="card-model-year">${item.brand} · ${item.year}</span>
+          <span class="card-category">${escapeCmsHtml(item.categoryLabel)}</span>
+          <span class="card-model-year">${escapeCmsHtml(item.brand)} · ${escapeCmsHtml(item.year)}</span>
         </div>
-        <h3 class="card-title" onclick="openProductModal('${item.id}')" style="cursor: pointer;">${item.name}</h3>
-        <p class="card-desc-brief">${item.brief}</p>
+        <h3 class="card-title" data-product-action="view" data-product-id="${escapeCmsHtml(item.id)}" style="cursor: pointer;">${escapeCmsHtml(item.name)}</h3>
+        <p class="card-desc-brief">${escapeCmsHtml(item.brief)}</p>
         
         <div class="specs-pills-grid">
           <div class="spec-pill">
             <span class="spec-pill-label">Power Rating</span>
-            <span class="spec-pill-val">${item.hp > 0 ? item.hp + ' HP' : 'Standard Ag'}</span>
+            <span class="spec-pill-val">${item.hp > 0 ? `${escapeCmsHtml(item.hp)} HP` : 'Standard Ag'}</span>
           </div>
           <div class="spec-pill">
             <span class="spec-pill-label">Drivetrain</span>
@@ -617,14 +641,14 @@ function renderCatalogue() {
 
         <div class="card-price-row">
           <span class="price-label">Official Dealership Price</span>
-          <span class="price-val">${item.priceText}</span>
+          <span class="price-val">${escapeCmsHtml(item.priceText)}</span>
         </div>
 
         <div class="card-actions-row">
-          <button class="btn btn-secondary btn-sm" onclick="openProductModal('${item.id}')">
+          <button class="btn btn-secondary btn-sm" data-product-action="view" data-product-id="${escapeCmsHtml(item.id)}">
             View Specs
           </button>
-          <button class="btn btn-primary btn-sm" onclick="openQuotationModal('${item.name}')">
+          <button class="btn btn-primary btn-sm" data-product-action="quote" data-product-id="${escapeCmsHtml(item.id)}">
             Request Quote
           </button>
         </div>
@@ -637,6 +661,7 @@ function renderCatalogue() {
 function initModals() {
   const modalBackdrop = document.getElementById("productModalBackdrop");
   const closeBtn = document.getElementById("productModalClose");
+  const modalBody = document.getElementById("productModalContent");
 
   if (!modalBackdrop) return;
 
@@ -646,6 +671,16 @@ function initModals() {
   };
 
   if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  if (modalBody) {
+    modalBody.addEventListener("click", (event) => {
+      const quoteButton = event.target.closest("[data-modal-quote]");
+      if (!quoteButton) return;
+      const item = INVENTORY_DATA.find((product) => product.id === quoteButton.dataset.modalQuote);
+      if (!item) return;
+      closeProductModal();
+      openQuotationModal(item.name);
+    });
+  }
   modalBackdrop.addEventListener("click", (e) => {
     if (e.target === modalBackdrop) closeModal();
   });
@@ -668,40 +703,41 @@ function openProductModal(productId) {
   const modalBody = document.getElementById("productModalContent");
   if (!modalBackdrop || !modalBody) return;
 
-  const specsRows = Object.entries(item.specs).map(([label, val]) => `
+  const specsRows = Object.entries(item.specs || {}).map(([label, val]) => `
     <tr>
-      <td>${label}</td>
-      <td>${val}</td>
+      <td>${escapeCmsHtml(label)}</td>
+      <td>${escapeCmsHtml(val)}</td>
     </tr>
   `).join("");
 
   const waMessage = encodeURIComponent(`Hello Relentless Tractors! I would like to request technical details and official pricing for the ${item.name}. Please share current availability and delivery timeline.`);
+  const images = Array.isArray(item.images) && item.images.length ? item.images : [item.image];
 
   modalBody.innerHTML = `
     <div class="modal-inner-grid">
       <div class="modal-media-col">
         <div class="modal-main-img-box">
-          <img id="modalViewerMainImg" src="${item.image}" alt="${item.name}">
+          <img id="modalViewerMainImg" src="${escapeCmsHtml(safeCmsImage(item.image))}" alt="${escapeCmsHtml(item.name)}">
         </div>
         <div style="display: flex; gap: 8px;">
-          ${item.images.map((img, idx) => `
-            <img src="${img}" alt="Thumbnail ${idx}" style="width: 70px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 2px solid ${idx === 0 ? 'var(--primary-green)' : 'transparent'};" onclick="document.getElementById('modalViewerMainImg').src='${img}'; this.parentElement.querySelectorAll('img').forEach(el => el.style.borderColor='transparent'); this.style.borderColor='var(--primary-green)';">
+          ${images.map((img, idx) => `
+            <img src="${escapeCmsHtml(safeCmsImage(img))}" alt="Thumbnail ${idx + 1}" style="width: 70px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 2px solid ${idx === 0 ? 'var(--primary-green)' : 'transparent'};" onclick="document.getElementById('modalViewerMainImg').src=this.src; this.parentElement.querySelectorAll('img').forEach(el => el.style.borderColor='transparent'); this.style.borderColor='var(--primary-green)';">
           `).join("")}
         </div>
         <div style="margin-top: 12px; background: var(--surface-alt); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
           <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 4px;">Recommended Farm Applications</span>
-          <p style="font-size: 0.88rem; color: var(--text-main); margin-bottom: 0;">${item.idealFor}</p>
+          <p style="font-size: 0.88rem; color: var(--text-main); margin-bottom: 0;">${escapeCmsHtml(item.idealFor)}</p>
         </div>
       </div>
 
       <div class="modal-details-col">
         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-          <span class="badge ${item.condition === 'new' ? 'badge-green' : 'badge-gold'}">${item.conditionLabel}</span>
-          <span class="badge badge-stock">${item.availabilityLabel}</span>
+          <span class="badge ${item.condition === 'new' ? 'badge-green' : 'badge-gold'}">${escapeCmsHtml(item.conditionLabel)}</span>
+          <span class="badge badge-stock">${escapeCmsHtml(item.availabilityLabel)}</span>
         </div>
-        <h2 style="font-size: 1.75rem; margin-bottom: 6px; font-family: 'Fraunces', serif;">${item.name}</h2>
-        <div style="font-size: 0.88rem; color: var(--gold); font-weight: 700; margin-bottom: 14px;">${item.brand} · ${item.model} (${item.year})</div>
-        <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">${item.description}</p>
+        <h2 style="font-size: 1.75rem; margin-bottom: 6px; font-family: 'Fraunces', serif;">${escapeCmsHtml(item.name)}</h2>
+        <div style="font-size: 0.88rem; color: var(--gold); font-weight: 700; margin-bottom: 14px;">${escapeCmsHtml(item.brand)} · ${escapeCmsHtml(item.model)} (${escapeCmsHtml(item.year)})</div>
+        <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">${escapeCmsHtml(item.description)}</p>
         
         <h4 style="font-size: 1rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-main); margin-top: 18px; margin-bottom: 8px; border-bottom: 2px solid var(--gold); padding-bottom: 4px; display: inline-block;">Technical Specifications</h4>
         <table class="specs-table">
@@ -712,7 +748,7 @@ function openProductModal(productId) {
 
         <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px;">
           <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <button class="btn btn-primary" style="flex: 1;" onclick="closeProductModal(); openQuotationModal('${item.name}')">
+            <button class="btn btn-primary" style="flex: 1;" data-modal-quote="${escapeCmsHtml(item.id)}">
               Request Official Quotation
             </button>
             <a href="https://wa.me/254708421323?text=${waMessage}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" style="flex: 1;">
@@ -910,7 +946,7 @@ function initContactForm() {
 
 // 9. GALLERY LIGHTBOX
 let activeGalleryIdx = 0;
-const GALLERY_ITEMS = [
+let GALLERY_ITEMS = [
   {
     src: "assets/tractor-zoomlion-rc904a.jpg",
     title: "Zoomlion RC904-A (90HP 4WD)",
@@ -957,6 +993,148 @@ const GALLERY_ITEMS = [
     subtitle: "High drawbar horsepower delivering consistent furrow depth"
   }
 ];
+
+window.RELENTLESS_CMS_DEFAULTS = {
+  products: INVENTORY_DATA,
+  articles: BLOG_ARTICLES,
+  gallery: GALLERY_ITEMS
+};
+
+function escapeCmsHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[character]);
+}
+
+function safeCmsImage(value) {
+  const url = String(value || "");
+  return /^(https:\/\/|\/(?!\/)|assets\/)/i.test(url) ? url : "assets/hero-tractor.jpg";
+}
+
+function sanitizeCmsHtml(markup) {
+  const parsed = new DOMParser().parseFromString(`<body>${String(markup || "")}</body>`, "text/html");
+  const allowed = new Set(["A", "BLOCKQUOTE", "BR", "EM", "H3", "H4", "H5", "LI", "OL", "P", "STRONG", "B", "I", "UL"]);
+  const blocked = new Set(["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "SVG", "MATH", "FORM", "INPUT", "BUTTON"]);
+  const cleanChildren = (source) => {
+    const fragment = document.createDocumentFragment();
+    Array.from(source.childNodes).forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        fragment.appendChild(document.createTextNode(node.nodeValue || ""));
+        return;
+      }
+      if (node.nodeType !== Node.ELEMENT_NODE || blocked.has(node.tagName)) return;
+      const children = cleanChildren(node);
+      if (!allowed.has(node.tagName)) {
+        fragment.appendChild(children);
+        return;
+      }
+      const clean = document.createElement(node.tagName.toLowerCase());
+      if (node.tagName === "A") {
+        const href = node.getAttribute("href") || "";
+        if (/^(https?:|mailto:)/i.test(href)) {
+          clean.setAttribute("href", href);
+          clean.setAttribute("rel", "noopener noreferrer");
+          clean.setAttribute("target", "_blank");
+        }
+      }
+      clean.appendChild(children);
+      fragment.appendChild(clean);
+    });
+    return fragment;
+  };
+  const container = document.createElement("div");
+  container.appendChild(cleanChildren(parsed.body));
+  return container.innerHTML;
+}
+
+function renderCmsProductCard(item) {
+  const id = escapeCmsHtml(item.id);
+  const name = escapeCmsHtml(item.name);
+  return `
+    <article class="machinery-card">
+      <div class="card-image-box" data-product-action="view" data-product-id="${id}" tabindex="0" role="button" aria-label="View ${name}">
+        <img src="${escapeCmsHtml(safeCmsImage(item.image))}" alt="${name}" loading="lazy">
+        <div class="card-badge-layer">
+          <span class="badge ${item.condition === "new" ? "badge-green" : "badge-gold"}">${escapeCmsHtml(item.conditionLabel)}</span>
+          <span class="badge badge-stock">${escapeCmsHtml(item.availabilityLabel)}</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-meta-row"><span class="card-category">${escapeCmsHtml(item.categoryLabel)}</span><span class="card-model-year">${escapeCmsHtml(item.brand)} · ${escapeCmsHtml(item.year)}</span></div>
+        <h3 class="card-title" data-product-action="view" data-product-id="${id}" style="cursor:pointer;">${name}</h3>
+        <p class="card-desc-brief">${escapeCmsHtml(item.brief)}</p>
+        <div class="specs-pills-grid">
+          <div class="spec-pill"><span class="spec-pill-label">Power Rating</span><span class="spec-pill-val">${item.hp > 0 ? `${escapeCmsHtml(item.hp)} HP` : "Standard Ag"}</span></div>
+          <div class="spec-pill"><span class="spec-pill-label">Drivetrain</span><span class="spec-pill-val">${item.category === "tractors" ? "4WD Dual Hub" : "3-Point / PTO"}</span></div>
+        </div>
+        <div class="card-price-row"><span class="price-label">Official Dealership Price</span><span class="price-val">${escapeCmsHtml(item.priceText)}</span></div>
+        <div class="card-actions-row">
+          <button class="btn btn-secondary btn-sm" data-product-action="view" data-product-id="${id}">View Specs</button>
+          <button class="btn btn-primary btn-sm" data-product-action="quote" data-product-id="${id}">Request Quote</button>
+        </div>
+      </div>
+    </article>`;
+}
+
+function renderCmsArticles() {
+  const grid = document.getElementById("blogGrid");
+  if (!grid) return;
+  grid.innerHTML = BLOG_ARTICLES.map((article) => `
+    <article class="blog-card">
+      <div class="blog-card-media" data-article-id="${escapeCmsHtml(article.id)}" role="button" tabindex="0" style="cursor:pointer;">
+        <img src="${escapeCmsHtml(safeCmsImage(article.image))}" alt="${escapeCmsHtml(article.title)}" loading="lazy">
+      </div>
+      <div class="blog-card-body">
+        <div class="blog-meta-row"><span class="blog-tag">${escapeCmsHtml(article.tag)}</span><span>${escapeCmsHtml(article.readTime)}</span></div>
+        <h3><a href="#blog" data-article-id="${escapeCmsHtml(article.id)}">${escapeCmsHtml(article.title)}</a></h3>
+        <p>${escapeCmsHtml(article.summary)}</p>
+        <button class="read-guide-btn" data-article-id="${escapeCmsHtml(article.id)}">Read Full Guide <span aria-hidden="true">›</span></button>
+      </div>
+    </article>`).join("");
+}
+
+function renderCmsGallery() {
+  const grid = document.getElementById("galleryGrid");
+  if (!grid) return;
+  grid.innerHTML = GALLERY_ITEMS.map((item, index) => `
+    <div class="gallery-item ${index === 0 || index === 3 || index === 6 ? "span-2-col" : ""} ${index === 0 ? "span-2-row" : ""}" onclick="openLightbox(${index})">
+      <img src="${escapeCmsHtml(safeCmsImage(item.src))}" alt="${escapeCmsHtml(item.title)}" loading="lazy">
+      <div class="gallery-overlay"><div class="gallery-caption-title">${escapeCmsHtml(item.title)}</div><div class="gallery-caption-sub">${escapeCmsHtml(item.subtitle)}</div></div>
+    </div>`).join("");
+}
+
+async function loadCmsContent() {
+  const config = window.RELENTLESS_SUPABASE_CONFIG;
+  if (!config || !/^https:\/\/[^/]+\.supabase\.co$/.test(config.url) ||
+      !config.anonKey || config.anonKey.includes("YOUR_")) return;
+  if (!window.supabase) {
+    console.error("Supabase client failed to load; using built-in website content.");
+    return;
+  }
+  try {
+    const client = window.supabase.createClient(config.url, config.anonKey);
+    const { data: setting, error: settingError } = await client.from("cms_settings")
+      .select("enabled").eq("id", 1).maybeSingle();
+    if (settingError) throw settingError;
+    if (!setting?.enabled) return;
+    const [products, articles, gallery] = await Promise.all([
+      client.from("cms_products").select("id,content,featured,sort_order").eq("published", true).order("sort_order"),
+      client.from("cms_articles").select("id,content,sort_order").eq("published", true).order("sort_order"),
+      client.from("cms_gallery").select("id,content,sort_order").eq("published", true).order("sort_order")
+    ]);
+    const failed = [products, articles, gallery].find((result) => result.error);
+    if (failed?.error) throw failed.error;
+    INVENTORY_DATA = (products.data || []).map((row) => ({ ...row.content, id: row.id, featured: row.featured }));
+    BLOG_ARTICLES = (articles.data || []).map((row) => ({ ...row.content, id: row.id }));
+    GALLERY_ITEMS = (gallery.data || []).map((row) => ({ ...row.content, id: row.id }));
+    window.cmsContentEnabled = true;
+    renderCatalogue();
+    renderCmsArticles();
+    renderCmsGallery();
+  } catch (error) {
+    console.error("Could not load published CMS content; using built-in website content.", error);
+  }
+}
 
 function initGalleryLightbox() {
   const lightbox = document.getElementById("lightboxModal");
@@ -1022,8 +1200,30 @@ function closeLightbox() {
 function initBlogReader() {
   const modal = document.getElementById("blogReaderModal");
   const closeBtn = document.getElementById("blogReaderClose");
+  const grid = document.getElementById("blogGrid");
 
   if (!modal) return;
+  if (grid) {
+    grid.addEventListener("click", (event) => {
+      const trigger = event.target.closest("[data-article-id]");
+      if (trigger) openBlogModal(trigger.dataset.articleId);
+    });
+    grid.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const trigger = event.target.closest("[data-article-id]");
+      if (!trigger) return;
+      event.preventDefault();
+      openBlogModal(trigger.dataset.articleId);
+    });
+  }
+  modal.addEventListener("click", (event) => {
+    const quoteTrigger = event.target.closest("[data-article-quote]");
+    if (!quoteTrigger) return;
+    const article = BLOG_ARTICLES.find((item) => item.id === quoteTrigger.dataset.articleQuote);
+    if (!article) return;
+    closeBlogModal();
+    openQuotationModal(article.title);
+  });
   if (closeBtn) closeBtn.addEventListener("click", closeBlogModal);
   modal.addEventListener("click", (e) => {
     if (e.target === modal) closeBlogModal();
@@ -1041,22 +1241,22 @@ function openBlogModal(articleId) {
   contentEl.innerHTML = `
     <div style="padding: 36px 40px;">
       <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 14px;">
-        <span class="badge badge-gold">${article.tag}</span>
-        <span style="font-size: 0.85rem; color: var(--text-subtle);">${article.date} · ${article.readTime}</span>
+        <span class="badge badge-gold">${escapeCmsHtml(article.tag)}</span>
+        <span style="font-size: 0.85rem; color: var(--text-subtle);">${escapeCmsHtml(article.date)} · ${escapeCmsHtml(article.readTime)}</span>
       </div>
-      <h2 style="font-size: 2rem; font-family: 'Fraunces', serif; margin-bottom: 20px; line-height: 1.2;">${article.title}</h2>
+      <h2 style="font-size: 2rem; font-family: 'Fraunces', serif; margin-bottom: 20px; line-height: 1.2;">${escapeCmsHtml(article.title)}</h2>
       <div style="border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 26px; max-height: 340px;">
-        <img src="${article.image}" alt="${article.title}" style="width: 100%; height: 320px; object-fit: cover;">
+        <img src="${escapeCmsHtml(safeCmsImage(article.image))}" alt="${escapeCmsHtml(article.title)}" style="width: 100%; height: 320px; object-fit: cover;">
       </div>
       <div class="article-body-text" style="font-size: 1rem; color: var(--text-main); line-height: 1.75;">
-        ${article.content}
+        ${sanitizeCmsHtml(article.content)}
       </div>
       <div style="margin-top: 36px; padding: 24px; background: var(--surface-alt); border-radius: var(--radius-md); border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
         <div>
           <h4 style="font-size: 1.1rem; margin-bottom: 4px;">Need machinery advice for your specific soil type?</h4>
           <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">Our agricultural advisors are available at Chemelil or on WhatsApp.</p>
         </div>
-        <button class="btn btn-primary" onclick="closeBlogModal(); openQuotationModal('${article.title}')">Talk to an Advisor</button>
+        <button class="btn btn-primary" data-article-quote="${escapeCmsHtml(article.id)}">Talk to an Advisor</button>
       </div>
     </div>
   `;

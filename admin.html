@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#10221a">
+  <title>Admin | Relentless Tractors</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+  <main id="loginView" class="login-shell">
+    <form id="loginForm" class="login-card">
+      <a class="login-brand" href="index.html"><img src="assets/logo_original.png" alt=""> Relentless <span>Tractors</span></a>
+      <p class="eyebrow">CONTENT MANAGEMENT</p>
+      <h1>Welcome back</h1>
+      <p class="muted">Sign in with an approved administrator account.</p>
+      <label>Email address<input id="loginEmail" type="email" autocomplete="username" required></label>
+      <label>Password<input id="loginPassword" type="password" autocomplete="current-password" required></label>
+      <p id="loginError" class="form-error" role="alert"></p>
+      <button class="button button-primary" type="submit">Sign in to dashboard</button>
+      <a class="back-link" href="index.html">← Back to website</a>
+    </form>
+  </main>
+
+  <div id="adminView" class="admin-shell" hidden>
+    <aside class="sidebar">
+      <a class="sidebar-brand" href="admin.html"><img src="assets/logo_original.png" alt=""><span>Relentless<strong>Admin</strong></span></a>
+      <p class="sidebar-label">WORKSPACE</p>
+      <nav id="sectionNav" aria-label="Admin sections">
+        <button class="nav-item active" data-section="overview"><span>◫</span> Overview</button>
+        <button class="nav-item" data-section="products"><span>▦</span> Inventory <b id="productNavCount">0</b></button>
+        <button class="nav-item" data-section="articles"><span>▤</span> Articles <b id="articleNavCount">0</b></button>
+        <button class="nav-item" data-section="gallery"><span>▧</span> Gallery <b id="galleryNavCount">0</b></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="site-status"><i></i><span><strong>CMS connected</strong><small>Supabase secure storage</small></span></div>
+        <a class="site-link" href="index.html" target="_blank" rel="noopener">↗ View live website</a>
+        <button id="signOutButton" class="signout-button">↪ Sign out</button>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="crumb">Relentless Tractors <span>/</span> <strong id="sectionTitle">Overview</strong></div>
+        <div class="topbar-user"><span id="adminAvatar">A</span><span id="adminEmail"></span></div>
+      </header>
+      <main class="main-content">
+        <div id="notice" class="notice" role="status" hidden></div>
+        <section id="overviewSection" class="content-section">
+          <div class="page-heading"><div><p class="eyebrow">YOUR BUSINESS AT A GLANCE</p><h1>Good to see you.</h1><p class="muted">Manage the content your customers see across your website.</p></div><button id="quickAddButton" class="button button-primary">＋ Add content</button></div>
+          <div class="stat-grid">
+            <article class="stat-card"><span class="stat-icon green">▦</span><span class="stat-label">Inventory items</span><strong id="productStat">0</strong><small id="productPublishedStat">0 published</small></article>
+            <article class="stat-card"><span class="stat-icon gold">▤</span><span class="stat-label">Buying guides</span><strong id="articleStat">0</strong><small id="articlePublishedStat">0 published</small></article>
+            <article class="stat-card"><span class="stat-icon blue">▧</span><span class="stat-label">Gallery images</span><strong id="galleryStat">0</strong><small id="galleryPublishedStat">0 published</small></article>
+          </div>
+          <div class="overview-grid">
+            <article class="panel">
+              <div class="panel-heading"><div><h2>Recent content</h2><p class="muted">The latest items in your CMS</p></div></div>
+              <div id="recentContent" class="recent-list"></div>
+            </article>
+            <article class="panel cms-panel">
+              <div class="panel-heading"><div><h2>Website publishing</h2><p class="muted">Control when CMS content appears on the public website.</p></div></div>
+              <div class="publish-row"><div><strong id="publishState">Loading status…</strong><p id="publishDescription" class="muted">Your website currently uses its built-in content.</p></div><label class="switch"><input id="cmsEnabled" type="checkbox"><span></span></label></div>
+              <button id="importStarterButton" class="button button-secondary">Import website starter content</button>
+              <p class="help-text">Adds the current inventory, guides and gallery to your CMS. Existing records are kept unchanged.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="productsSection" class="content-section" hidden>
+          <div class="page-heading"><div><p class="eyebrow">SHOWROOM & STOCK</p><h1>Inventory</h1><p class="muted">Manage machinery listings and featured products.</p></div><button class="button button-primary add-item" data-kind="products">＋ Add inventory</button></div>
+          <div class="panel">
+            <div class="toolbar"><label class="search-field">⌕ <input id="productsSearch" type="search" placeholder="Search inventory"></label><span id="productsSummary" class="muted"></span></div>
+            <div id="productsList" class="content-list"></div>
+          </div>
+        </section>
+
+        <section id="articlesSection" class="content-section" hidden>
+          <div class="page-heading"><div><p class="eyebrow">KNOWLEDGE & BUYING GUIDES</p><h1>Articles</h1><p class="muted">Write and publish advice for your customers.</p></div><button class="button button-primary add-item" data-kind="articles">＋ Write article</button></div>
+          <div class="panel">
+            <div class="toolbar"><label class="search-field">⌕ <input id="articlesSearch" type="search" placeholder="Search articles"></label><span id="articlesSummary" class="muted"></span></div>
+            <div id="articlesList" class="content-list"></div>
+          </div>
+        </section>
+
+        <section id="gallerySection" class="content-section" hidden>
+          <div class="page-heading"><div><p class="eyebrow">SHOWROOM & FIELD PHOTOS</p><h1>Gallery</h1><p class="muted">Curate the images and captions on your website.</p></div><button class="button button-primary add-item" data-kind="gallery">＋ Add image</button></div>
+          <div class="panel">
+            <div class="toolbar"><span id="gallerySummary" class="muted"></span></div>
+            <div id="galleryList" class="gallery-admin-grid"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="editorDialog" class="editor-dialog">
+    <form id="editorForm" method="dialog">
+      <header class="editor-header"><div><p class="eyebrow" id="editorEyebrow">CONTENT</p><h2 id="editorTitle">Edit content</h2></div><button class="icon-button" type="button" id="editorClose" aria-label="Close">×</button></header>
+      <div id="editorFields" class="editor-fields"></div>
+      <div class="editor-options"><label class="check-option"><input id="editorPublished" type="checkbox"> Published</label><label id="featuredOption" class="check-option"><input id="editorFeatured" type="checkbox"> Feature on homepage</label></div>
+      <p id="editorError" class="form-error" role="alert"></p>
+      <footer class="editor-footer"><button class="button button-secondary" type="button" id="editorCancel">Cancel</button><button class="button button-primary" type="submit" id="editorSave">Save changes</button></footer>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>
