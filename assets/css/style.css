@@ -2836,3 +2836,143 @@ aside {
     height: 230px;
   }
 }
+
+/* Layered field-inspired surfaces */
+body {
+  background-image:
+    radial-gradient(ellipse at 8% 12%, rgba(204, 173, 105, 0.08), transparent 32rem),
+    radial-gradient(ellipse at 92% 46%, rgba(50, 118, 69, 0.06), transparent 36rem);
+  background-attachment: fixed;
+}
+
+.hero-section {
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 78% 16%, rgba(213, 169, 75, 0.18), transparent 35%),
+    linear-gradient(145deg, #052607 0%, #003300 54%, #071e0a 100%);
+}
+
+.hero-overlay {
+  background:
+    radial-gradient(ellipse at 76% 20%, rgba(223, 174, 75, 0.16), transparent 34%),
+    linear-gradient(105deg, rgba(0, 29, 0, 0.9) 0%, rgba(0, 46, 0, 0.72) 48%, rgba(2, 22, 3, 0.75) 100%);
+}
+
+.hero-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-radial-gradient(
+      ellipse at 88% 46%,
+      transparent 0 36px,
+      rgba(233, 203, 138, 0.13) 37px 38px,
+      transparent 39px 68px
+    );
+  opacity: 0.62;
+  mask-image: linear-gradient(100deg, transparent 8%, rgba(0, 0, 0, 0.9) 75%);
+  pointer-events: none;
+}
+
+.featured-section,
+.services-section,
+.gallery-section {
+  background-color: var(--surface-light);
+  background-image:
+    radial-gradient(ellipse at 100% 0%, rgba(190, 162, 99, 0.09), transparent 32rem),
+    repeating-radial-gradient(
+      ellipse at 100% 0%,
+      transparent 0 54px,
+      rgba(0, 80, 29, 0.025) 55px 56px,
+      transparent 57px 92px
+    );
+}
+
+.catalogue-section,
+.about-section,
+.blog-section,
+.contact-section {
+  background-color: var(--surface-card);
+  background-image:
+    radial-gradient(ellipse at 0% 100%, rgba(0, 91, 31, 0.045), transparent 34rem),
+    radial-gradient(ellipse at 100% 0%, rgba(207, 169, 92, 0.06), transparent 30rem);
+}
+
+.why-section,
+.categories-showcase-section {
+  background-color: var(--surface-alt);
+  background-image:
+    radial-gradient(ellipse at 12% 10%, rgba(255, 255, 255, 0.66), transparent 32rem),
+    repeating-radial-gradient(
+      ellipse at 100% 100%,
+      transparent 0 58px,
+      rgba(0, 82, 29, 0.035) 59px 60px,
+      transparent 61px 98px
+    );
+}
+
+.quote-section {
+  background-color: var(--surface-alt);
+  background-image:
+    radial-gradient(ellipse at 8% 0%, rgba(194, 157, 73, 0.13), transparent 28rem),
+    radial-gradient(ellipse at 92% 100%, rgba(0, 92, 32, 0.09), transparent 32rem),
+    linear-gradient(145deg, var(--surface-light), var(--surface-alt));
+}
+
+.cta-banner-section {
+  background:
+    radial-gradient(ellipse at 82% 0%, rgba(215, 169, 70, 0.18), transparent 38%),
+    repeating-radial-gradient(
+      ellipse at 100% 100%,
+      transparent 0 46px,
+      rgba(228, 209, 157, 0.08) 47px 48px,
+      transparent 49px 80px
+    ),
+    linear-gradient(135deg, #021a02 0%, #003300 54%, #052a08 100%);
+}
+
+.section:not(.hero-section)::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: max(24px, calc((100% - var(--max-w)) / 2 + 24px));
+  width: clamp(44px, 8vw, 92px);
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), rgba(142, 91, 8, 0));
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  body {
+    background-attachment: scroll;
+  }
+
+  .btn {
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .hero-overlay::after {
+    background:
+      repeating-radial-gradient(
+        ellipse at 100% 54%,
+        transparent 0 34px,
+        rgba(233, 203, 138, 0.11) 35px 36px,
+        transparent 37px 64px
+      );
+    opacity: 0.45;
+    mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.85) 100%);
+  }
+
+  .section:not(.hero-section)::after {
+    left: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section:not(.hero-section)::after {
+    left: 16px;
+  }
+}
